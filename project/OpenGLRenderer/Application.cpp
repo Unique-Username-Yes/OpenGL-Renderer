@@ -4,38 +4,9 @@
 
 namespace OpenGLRenderer
 {
-    static void GLFWErrorCallback(int error, const char* description)
-	{
-		printf("GLFW Error ({0}): {1}", error, description);
-	}
-
     Application::Application(const WindowProps& props)
     {
-        if(int success = glfwInit(); !success)
-        {
-            std::runtime_error("GLFW Error: Could not initialize GLFW");
-        }
-
-        glfwSetErrorCallback(GLFWErrorCallback);
-
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-        m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, props.Title.c_str(), nullptr, nullptr);
-
-        glfwMakeContextCurrent(m_Window);
-        
-        if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            std::runtime_error("Failed to initialize GLAD");
-        }
-    }
-
-    void OpenGLRenderer::Application::ProcessInputs()
-    {
-        if(glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            m_Running = false;
+        m_Window = new Window{};
     }
 
     void Application::Run()
@@ -48,7 +19,7 @@ namespace OpenGLRenderer
 
         while(m_Running)
         {
-            ProcessInputs();
+            m_Running = !m_Window->IsCloseEventTriggered();
 
             // Render
             glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -56,12 +27,10 @@ namespace OpenGLRenderer
 
             for(Layer* layer: m_LayerStack)
             {
-                layer->OnUpdate(glfwGetTime());
+                layer->OnUpdate(m_Window->GetTime());
             }            
 
-            // Buffer swap and IO
-            glfwSwapBuffers(m_Window);
-            glfwPollEvents();
+            m_Window->OnUpdate();
         }
     }
 }

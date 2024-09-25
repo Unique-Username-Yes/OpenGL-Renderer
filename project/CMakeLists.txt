@@ -12,6 +12,7 @@ add_executable(OGLRenderer
     OpenGLRenderer/Application.cpp
     OpenGLRenderer/LayerStack.cpp
     OpenGLRenderer/Layer.cpp
+    OpenGLRenderer/Window.cpp
     vendors/glad/src/glad.c
 )
 
