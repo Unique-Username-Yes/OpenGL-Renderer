@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include "LayerStack.hpp"
 
 namespace OpenGLRenderer 
 {
@@ -31,11 +32,14 @@ namespace OpenGLRenderer
 
             void Run();
 
+            inline void PushLayer(Layer* layer) { m_LayerStack.PushLayer(layer); }
+
         private:
             void ProcessInputs();
 
         private: 
             GLFWwindow* m_Window;
             bool m_Running { true };
+            LayerStack m_LayerStack {};
     };
 }

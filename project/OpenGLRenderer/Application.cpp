@@ -1,6 +1,6 @@
-#include "Application.h"
+#include "Application.hpp"
 #include <span>
-#include "shaders/ShaderHandler.h"
+#include "shaders/ShaderHandler.hpp"
 
 namespace OpenGLRenderer
 {
@@ -8,39 +8,6 @@ namespace OpenGLRenderer
 	{
 		printf("GLFW Error ({0}): {1}", error, description);
 	}
-
-    static void bindVerticesToVBO(std::span<const float> vertices)
-    {
-        unsigned int VBO;
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), vertices.data(), GL_STATIC_DRAW);
-    }
-
-    const float vertices[] = 
-    {
-        -0.25f, 0.0f, 0.0f,
-        0.25f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f,
-
-        -0.5f, -0.5f, 0.0f,
-        -0.25f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f,
-
-        0.0f, -0.5f, 0.0f,
-        0.25f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-
-        -0.25f, 0.0f, 0.0f,
-        0.0f,  0.5f, 0.0f,
-        0.25f, 0.0f, 0.0f  
-    };
-
-    const unsigned int indices[] = 
-    {
-        0, 1, 3,
-        1, 2, 3
-    };
 
     Application::Application(const WindowProps& props)
     {
@@ -74,16 +41,6 @@ namespace OpenGLRenderer
     void Application::Run()
     {
         ShaderHandler shaderHandler("/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.vs", "/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.fs");
-        
-        unsigned int VAO, VBO;
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-
-        glBindVertexArray(VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
 
         glViewport(0, 0, 800, 800);
 
@@ -97,8 +54,10 @@ namespace OpenGLRenderer
             glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            glBindVertexArray(VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 12);
+            for(Layer* layer: m_LayerStack)
+            {
+                layer->OnUpdate(glfwGetTime());
+            }            
 
             // Buffer swap and IO
             glfwSwapBuffers(m_Window);

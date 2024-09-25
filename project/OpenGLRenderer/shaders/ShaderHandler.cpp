@@ -1,7 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "ShaderHandler.h"
+#include "ShaderHandler.hpp"
 
 ShaderHandler::ShaderHandler(const char* vertexShaderSourcePath, const char* fragmentShaderSourcePath)
 {
