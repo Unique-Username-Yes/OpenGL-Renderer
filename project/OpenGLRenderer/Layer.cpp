@@ -2,7 +2,8 @@
 
 namespace OpenGLRenderer
 {
-    Layer::Layer()
+    Layer::Layer(const std::string& layerName)
+        : m_DebugName { layerName}
     {
 
     }

@@ -1,5 +1,6 @@
 #include "Window.hpp"
 #include <stdexcept>
+#include "Events/ApplicationEvent.hpp"
 
 namespace OpenGLRenderer
 {
@@ -10,6 +11,10 @@ namespace OpenGLRenderer
 
     Window::Window(const WindowProps& props)
     {
+		m_Data.Title = props.Title;
+		m_Data.Width = props.Width;
+		m_Data.Height = props.Height;
+
         if(int success = glfwInit(); !success)
         {
             std::runtime_error("GLFW Error: Could not initialize GLFW");
@@ -29,6 +34,15 @@ namespace OpenGLRenderer
         {
             std::runtime_error("Failed to initialize GLAD");
         }
+
+        glfwSetWindowUserPointer(m_Window, &m_Data);
+
+        glfwSetWindowCloseCallback(m_Window, [](GLFWwindow *window)
+        {
+            auto data = *(WindowData*)glfwGetWindowUserPointer(window);
+            WindowCloseEvent event;
+            data.eventCallback(event);  
+        });
     }
 
     void Window::OnUpdate()

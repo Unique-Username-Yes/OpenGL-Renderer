@@ -6,7 +6,12 @@
 class MainLayer: public OpenGLRenderer::Layer
 {
     public:
-        MainLayer(): Layer()
+        MainLayer(const std::string& layerName): OpenGLRenderer::Layer(layerName) 
+        { 
+            m_LayerName = layerName;
+            MainLayer(); 
+        }
+        MainLayer(): m_LayerName{"Layer"}
         {
             const float vertices[] = 
             {
@@ -51,7 +56,6 @@ class MainLayer: public OpenGLRenderer::Layer
 
         void OnAttach() override
         {
-
         }
 
         void OnDetach() override
@@ -59,6 +63,11 @@ class MainLayer: public OpenGLRenderer::Layer
 
         }
 
+        void OnEvent(OpenGLRenderer::Event &event) override 
+        {
+        }
+
     private:
         unsigned int m_VAO, m_VBO;
+        std::string m_LayerName;
 };

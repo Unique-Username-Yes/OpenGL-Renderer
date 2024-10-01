@@ -3,6 +3,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
+#include <functional>
+#include "Events/Event.hpp"
+
 
 namespace OpenGLRenderer
 {
@@ -26,10 +29,18 @@ namespace OpenGLRenderer
 
             void OnUpdate();
             inline float GetTime() const { return static_cast<float>(glfwGetTime()); }
-
-            inline bool IsCloseEventTriggered() const { return glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS; }
+            inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Data.eventCallback = callback; }
 
         private:
+            std::function<void(Event&)> eventCallback {};
             GLFWwindow* m_Window;
+
+            struct WindowData {
+                std::string Title;
+                int Width, Height;
+                std::function<void(Event&)> eventCallback;
+            };
+
+            WindowData m_Data;
     };
 }
