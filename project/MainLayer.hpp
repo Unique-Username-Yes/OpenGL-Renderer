@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include "OpenGLRenderer/Layer.hpp"
+#include "OpenGLRenderer/shaders/ShaderHandler.hpp"
 
 class MainLayer: public OpenGLRenderer::Layer
 {
@@ -46,6 +47,9 @@ class MainLayer: public OpenGLRenderer::Layer
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(0);
+
+            ShaderHandler shaderHandler {"/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.vs", "/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.fs"};
+            shaderHandler.Bind();
         }
 
         void OnUpdate(float timestep) override

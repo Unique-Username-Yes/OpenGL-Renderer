@@ -24,11 +24,7 @@ namespace OpenGLRenderer
 
     void Application::Run()
     {
-        ShaderHandler shaderHandler("/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.vs", "/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.fs");
-
         glViewport(0, 0, 800, 800);
-
-        shaderHandler.Use();
 
         while(m_Running)
         {

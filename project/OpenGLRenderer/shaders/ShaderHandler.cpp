@@ -3,7 +3,7 @@
 #include <iostream>
 #include "ShaderHandler.hpp"
 
-ShaderHandler::ShaderHandler(const char* vertexShaderSourcePath, const char* fragmentShaderSourcePath)
+ShaderHandler::ShaderHandler(const std::string &vertexShaderSourcePath, const std::string &fragmentShaderSourcePath)
 {
     auto vShaderCode = ReadShaderSource(vertexShaderSourcePath);
     auto fShaderCode = ReadShaderSource(fragmentShaderSourcePath);
@@ -11,18 +11,18 @@ ShaderHandler::ShaderHandler(const char* vertexShaderSourcePath, const char* fra
     auto vShader = CompileShader(vShaderCode.c_str(), GL_VERTEX_SHADER);
     auto fShader = CompileShader(fShaderCode.c_str(), GL_FRAGMENT_SHADER);
 
-    programId = glCreateProgram();
+    m_ProgramId = glCreateProgram();
 
-    glAttachShader(programId, vShader);
-    glAttachShader(programId, fShader);
+    glAttachShader(m_ProgramId, vShader);
+    glAttachShader(m_ProgramId, fShader);
 
-    glLinkProgram(programId);
+    glLinkProgram(m_ProgramId);
     int success;
     char infoLog[512];
-    glGetProgramiv(programId, GL_LINK_STATUS, &success);
+    glGetProgramiv(m_ProgramId, GL_LINK_STATUS, &success);
     if(!success)
     {
-        glGetProgramInfoLog(programId, 512, NULL, infoLog);
+        glGetProgramInfoLog(m_ProgramId, 512, NULL, infoLog);
         std::cout << "ERROR:SHADER::LINKING_ERROR " << infoLog << std::endl;
     }
 
@@ -30,12 +30,7 @@ ShaderHandler::ShaderHandler(const char* vertexShaderSourcePath, const char* fra
     glDeleteShader(fShader);
 }
 
-void ShaderHandler::Use()
-{
-    glUseProgram(programId);
-}
-
-std::string ShaderHandler::ReadShaderSource(const char* filepath)
+std::string ShaderHandler::ReadShaderSource(const std::string &filepath)
 {
     std::ifstream shaderFile;
     shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -56,7 +51,7 @@ std::string ShaderHandler::ReadShaderSource(const char* filepath)
     return buffer.str();
 }
 
-unsigned int ShaderHandler::CompileShader(const char *source, GLenum shaderType)
+unsigned int ShaderHandler::CompileShader(const char* source, GLenum shaderType)
 {
     unsigned int shaderId;
     shaderId = glCreateShader(shaderType);

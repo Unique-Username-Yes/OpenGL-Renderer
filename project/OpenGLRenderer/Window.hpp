@@ -4,7 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <functional>
+#include <memory>
 #include "Events/Event.hpp"
+#include <iostream>
 
 
 namespace OpenGLRenderer
@@ -25,22 +27,32 @@ namespace OpenGLRenderer
     {
         public:
             Window(const WindowProps& props = WindowProps{});
-            inline ~Window(){ glfwTerminate(); }
+            ~Window(){ }
 
             void OnUpdate();
             inline float GetTime() const { return static_cast<float>(glfwGetTime()); }
-            inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Data.eventCallback = callback; }
+            inline void SetEventCallbackFn(std::function<void(Event&)> callback) { m_Data.m_EventCallback = callback; }
 
         private:
-            std::function<void(Event&)> eventCallback {};
-            GLFWwindow* m_Window;
+            static void GLFWwindowDeleter(GLFWwindow* window)
+            {
+                if(window)
+                    glfwDestroyWindow(window);
+            }
+
+        private:
+            using unique_glfwwindow_ptr = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>>;
+
+            unique_glfwwindow_ptr m_Window;
+
+            std::function<void(Event&)> m_EventCallback {};
 
             struct WindowData {
                 std::string Title;
                 int Width, Height;
-                std::function<void(Event&)> eventCallback;
+                std::function<void(Event&)> m_EventCallback;
             };
 
-            WindowData m_Data;
+            WindowData m_Data {};
     };
 }
