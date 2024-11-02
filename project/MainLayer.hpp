@@ -3,34 +3,23 @@
 #include <glad/glad.h>
 #include "OpenGLRenderer/Layer.hpp"
 #include "OpenGLRenderer/shaders/ShaderHandler.hpp"
+#include "stb_image.h"
+#include "OpenGLRenderer/Renderer/Texture2D.hpp"
 
 class MainLayer: public OpenGLRenderer::Layer
 {
     public:
-        MainLayer(const std::string& layerName): OpenGLRenderer::Layer(layerName) 
-        { 
-            m_LayerName = layerName;
-            MainLayer(); 
-        }
-        MainLayer(): m_LayerName{"Layer"}
+        MainLayer(const std::string& layerName = "Layer"): 
+            m_LayerName{layerName}, 
+            m_WallTexture{"/home/mmyes/Projects/OpenGL-Renderer/assets/textures/wall.jpg"},
+            m_FaceTexture{"/home/mmyes/Projects/OpenGL-Renderer/assets/textures/awesomeface.png"}
         {
             const float vertices[] = 
             {
-                -0.25f, 0.0f, 0.0f,
-                0.25f, 0.0f, 0.0f,
-                0.0f, -0.5f, 0.0f,
-
-                -0.5f, -0.5f, 0.0f,
-                -0.25f, 0.0f, 0.0f,
-                0.0f, -0.5f, 0.0f,
-
-                0.0f, -0.5f, 0.0f,
-                0.25f, 0.0f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-
-                -0.25f, 0.0f, 0.0f,
-                0.0f,  0.5f, 0.0f,
-                0.25f, 0.0f, 0.0f  
+                 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // top right
+                 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // bottom right
+                -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+                -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // top left 
             };
 
             const unsigned int indices[] = 
@@ -41,21 +30,38 @@ class MainLayer: public OpenGLRenderer::Layer
 
             glGenVertexArrays(1, &m_VAO);
             glGenBuffers(1, &m_VBO);
+            glGenBuffers(1, &m_EBO);
 
             glBindVertexArray(m_VAO);
             glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
             glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)0);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (GLvoid*)(6 * sizeof(float)));
 
             ShaderHandler shaderHandler {"/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.vs", "/home/mmyes/Projects/OpenGL-Renderer/project/OpenGLRenderer/shaders/shaderSources/shader.fs"};
             shaderHandler.Bind();
+
+            // Texture stuff
+            m_WallTexture.Bind(GL_TEXTURE0);
+            m_FaceTexture.Bind(GL_TEXTURE1);
+
+            glUniform1i(glGetUniformLocation(shaderHandler.m_ProgramId, "textureSource"), 0);
+            glUniform1i(glGetUniformLocation(shaderHandler.m_ProgramId, "textureSource2"), 1);
         }
 
         void OnUpdate(float timestep) override
         {
             glBindVertexArray(m_VAO);
-            glDrawArrays(GL_TRIANGLES, 0, 12);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }
 
         void OnAttach() override
@@ -72,6 +78,7 @@ class MainLayer: public OpenGLRenderer::Layer
         }
 
     private:
-        unsigned int m_VAO, m_VBO;
+        unsigned int m_VAO, m_VBO, m_EBO;
         std::string m_LayerName;
+        OpenGLRenderer::Texture2D m_WallTexture, m_FaceTexture;
 };
