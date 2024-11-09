@@ -5,6 +5,8 @@
 #include "OpenGLRenderer/shaders/ShaderHandler.hpp"
 #include "stb_image.h"
 #include "OpenGLRenderer/Renderer/Texture2D.hpp"
+#include "OpenGLRenderer/Events/KeyEvent.hpp"
+#include "OpenGLRenderer/Events/KeyCodes.hpp"
 
 class MainLayer: public OpenGLRenderer::Layer
 {
@@ -16,10 +18,10 @@ class MainLayer: public OpenGLRenderer::Layer
         {
             const float vertices[] = 
             {
-                 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   2.0f, 2.0f,   // top right
-                 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   2.0f, 0.0f,   // bottom right
+                 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+                 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
                 -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-                -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // top left 
+                -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
             };
 
             const unsigned int indices[] = 
@@ -75,6 +77,21 @@ class MainLayer: public OpenGLRenderer::Layer
 
         void OnEvent(OpenGLRenderer::Event &event) override 
         {
+            if(event.GetEventType() == OpenGLRenderer::EventType::KeyTyped)
+            {
+                auto keyEvent = static_cast<OpenGLRenderer::KeyTypedEvent&>(event);
+                std::cout << keyEvent.ToString();
+                if(keyEvent.GetKeyCode() == OGLR_KEY_E)
+                {
+                    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                }
+                else
+                {
+                    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                }
+            }
         }
 
     private:

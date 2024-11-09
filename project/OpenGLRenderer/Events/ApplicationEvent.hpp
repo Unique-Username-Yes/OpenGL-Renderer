@@ -4,11 +4,12 @@
 
 namespace OpenGLRenderer
 {
-	class WindowCloseEvent : public Event {
-	public:
-		WindowCloseEvent() {}
-		~WindowCloseEvent() {}
+	class WindowCloseEvent : public Event 
+	{
+		public:
+			WindowCloseEvent() {}
+			~WindowCloseEvent() {}
 
-		virtual EventType GetEventType() const override { return EventType::WindowClose; }
+			virtual EventType GetEventType() const override { return EventType::WindowClose; }
 	};
 }

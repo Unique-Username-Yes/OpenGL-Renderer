@@ -1,6 +1,7 @@
 #include "Window.hpp"
 #include <stdexcept>
 #include "Events/ApplicationEvent.hpp"
+#include "Events/KeyEvent.hpp"
 
 namespace OpenGLRenderer
 {
@@ -42,6 +43,27 @@ namespace OpenGLRenderer
             auto data = *(WindowData*)glfwGetWindowUserPointer(window);
             WindowCloseEvent event;
             data.m_EventCallback(event);  
+        });
+
+        glfwSetKeyCallback(m_Window.get(), [](GLFWwindow* window, int key, int scancode, int action, int mods)
+        {
+            auto data = *(WindowData*)glfwGetWindowUserPointer(window);
+            if(action == GLFW_PRESS)
+            {
+                // Might actually be triggered by the glfwSetCharCallback
+                KeyTypedEvent event { key };
+                data.m_EventCallback(event);
+            }
+            else if(action == GLFW_RELEASE)
+            {
+                KeyUpEvent event { key };
+                data.m_EventCallback(event);
+            }
+            else if(action == GLFW_REPEAT)
+            {
+                KeyDownEvent event { key, 1};
+                data.m_EventCallback(event);
+            }
         });
     }
 
